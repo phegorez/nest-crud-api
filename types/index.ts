@@ -1,0 +1,3 @@
+interface ReturnedToken {
+    accessToken: string;
+}
