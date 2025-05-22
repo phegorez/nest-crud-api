@@ -1,5 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../../src/prisma/prisma.service';
 import { AuthDto } from './dto';
 import * as argon from 'argon2';
 // import { PrismaClientKnownRequestError } from '../../prisma/generated/client';
@@ -28,7 +28,8 @@ export class AuthService {
             })
 
             // return the saved user
-            return this.signToken(newUser.id, newUser.email);
+            const access_token = await this.signToken(newUser.id, newUser.email)
+            return { access_token };
         } catch (error) {
             if (error instanceof PrismaClientKnownRequestError) {
                 if (error.code === 'P2002') {
@@ -56,8 +57,9 @@ export class AuthService {
         // if password is incorrect throw exception
         if (!passwordMatches) throw new ForbiddenException('Credentials incorrect');
         // return the user
-        
-        return this.signToken(user.id, user.email);
+
+        const access_token = await this.signToken(user.id, user.email)
+        return { access_token };
     }
 
     signToken(userId: number, email: string): Promise<string> {
